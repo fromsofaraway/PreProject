@@ -22,7 +22,8 @@ public class User {
 
     }
 
-    public User(String name, String lastName, Byte age) {
+    public User(Long id, String name, String lastName, Byte age) {
+        this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.age = age;
@@ -62,7 +63,8 @@ public class User {
 
     @Override
     public String toString() {
-        return "\nname: " + name +
+        return "\nid: " + id +
+                ", name: " + name +
                 ", lastname: " + lastName +
                 ", age: " + age;
     }
