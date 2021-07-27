@@ -3,16 +3,11 @@ package jm.task.core.jdbc.service;
 import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
-
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-
-import jm.task.core.jdbc.util.Util;
 
 public class UserServiceImpl implements UserService {
 
-    UserDao dao;
+    private UserDao dao;
 
     public UserServiceImpl(){
         dao = new UserDaoJDBCImpl();
