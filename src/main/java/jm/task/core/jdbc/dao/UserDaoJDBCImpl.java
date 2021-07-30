@@ -12,13 +12,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
-    /* в общем я не освоил, можно ли сделать реализацию try с ресурсами, если необходимо дополнительно ловить
-    исключения роллбэков и коммитов, т.к. в таком случае я не могу созданный Connection обработать в блоке catch,
-    чтобы сделать conn.rollback
-
-    также не хотелось, чтобы блоки catch выглядели очень громоздко из-за вложенностей, поэтому в классе Util
-    создал отдельные методы close и rollback с ловлей исключений
-     */
 
     public void createUsersTable() {
         Connection conn = Util.getMyConnection();
@@ -76,7 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
                     ", age: " + age + " has been successfully added");
         } catch (SQLException e) {
             Util.rollback(conn);
-            System.out.println("Error during removing user");
+            System.out.println("Error during saving user");
             e.printStackTrace();
         } finally {
             Util.close(stmt);
@@ -111,15 +104,16 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select id, name, lastname, age from users");
-            while (rs.next()){
+            while (rs.next()) {
                 Long id = rs.getLong(1);
                 String name = rs.getString(2);
                 String lastname = rs.getString(3);
                 byte age = rs.getByte(4);
                 User user = new User(id, name, lastname, age);
+
                 list.add(user);
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             Util.rollback(conn);
             System.out.println("Error during getting all users");
         } finally {
