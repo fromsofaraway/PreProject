@@ -5,11 +5,6 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.List;
 
 
@@ -62,10 +57,9 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        User user = new User(name, lastName, age);
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(user);
+            session.save(new User(name, lastName, age));
             transaction.commit();
             System.out.println("User with name: " + name + ", lastname: " + lastName +
                     ", age: " + age + " has been successfully added");
@@ -102,13 +96,10 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         try (Session session = Util.getSessionFactory().openSession()) {
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<User> cq = cb.createQuery(User.class);
-            Root<User> rootEntry = cq.from(User.class);
-            CriteriaQuery<User> all = cq.select(rootEntry);
+            return session.createQuery("from User", User.class)
+                    .setReadOnly(true)
+                    .getResultList();
 
-            TypedQuery<User> allQuery = session.createQuery(all);
-            return allQuery.getResultList();
         } catch (Exception e) {
             System.out.println("Error during getting all users");
             e.printStackTrace();
@@ -121,10 +112,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            final List<User> users = getAllUsers();
-            for (User user : users) {
-                session.delete(user);
-            }
+            session.createQuery("delete from User").executeUpdate();
             transaction.commit();
             System.out.println("Users has been successfully removed");
         } catch (Exception e) {
